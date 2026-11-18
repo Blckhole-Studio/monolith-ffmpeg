@@ -13,14 +13,18 @@ or later. It holds everything needed to rebuild exactly what the app ships.
   [`n7.1.5` release](../../releases/tag/n7.1.5). It's also at <https://ffmpeg.org/releases/ffmpeg-7.1.5.tar.xz>.
 - **LGPL only.** It's built without `--enable-gpl`, `--enable-nonfree` or any external library. The build script
   stops if FFmpeg's `config.h` reports GPL or non-free.
-- **Shared libraries**, loaded by the app at run time: `libavcodec.so`, `libavutil.so`, `libswresample.so` and
-  `libswscale.so`, in the APK's `lib/<abi>/` folder. You can replace them with your own build of the same version.
+- **Shared libraries**, loaded by the app at run time: `libavcodec.so`, `libavformat.so`, `libavutil.so`,
+  `libswresample.so` and `libswscale.so`, in the APK's `lib/<abi>/` folder. You can replace them with your own build of the same version.
 - **ABIs:** `arm64-v8a` and `armeabi-v7a` (with NEON). The API level is 26 (Android 8.0), the app's minimum.
 - **NDK:** r27c (27.2.12479018), on macOS.
 - **Decoders:**
-  - Audio: ac3, eac3, truehd, mlp, dca, flac, alac, opus, vorbis, mp1, mp2, mp3, aac, pcm_mulaw and pcm_alaw.
-  - Video: h264, hevc, mpeg1video, mpeg2video, vc1, wmv3, mpeg4, msmpeg4v1-3, h263, vp8 and vp9.
-  - Everything else is disabled: no avformat, avfilter, avdevice, network, programs or autodetected libraries.
+  - Audio: ac3, eac3, truehd, mlp, dca, flac, alac, opus, vorbis, mp1, mp2, mp3, aac, pcm_mulaw, pcm_alaw,
+    pcm_bluray, pcm_dvd, wmav1, wmav2, wmapro, cook, adpcm_swf and nellymoser.
+  - Video: h264, hevc, mpeg1video, mpeg2video, vc1, wmv1, wmv2, wmv3, mpeg4, msmpeg4v1-3, h263, flv, vp6, vp6f,
+    vp6a, vp8, vp9, rv30 and rv40.
+- **Demuxers** (containers the app's own readers can't open): mpegts (M2TS/BDAV), mpegps (VOB), asf, flv, rm and avi,
+  with the parsers and bitstream filters listed in the build script.
+- Everything else is disabled: no avfilter, avdevice, network, protocols, programs or autodetected libraries.
 
 The exact `configure` lines are in [`ffmpeg-configuration-arm64-v8a.txt`](ffmpeg-configuration-arm64-v8a.txt) and
 [`ffmpeg-configuration-armeabi-v7a.txt`](ffmpeg-configuration-armeabi-v7a.txt). In them, `$NDK_BIN` is the NDK's

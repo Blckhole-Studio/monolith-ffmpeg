@@ -3,12 +3,12 @@
 # tarball, at https://github.com/Blckhole-Studio/monolith-ffmpeg
 #
 # LGPL only: no --enable-gpl, no --enable-nonfree, no external libraries (the build stops if config.h says otherwise).
-# Shared libraries (libavcodec.so, libavutil.so, libswresample.so, libswscale.so), which the app loads at run time, so
+# Shared libraries (libavcodec.so, libavformat.so, libavutil.so, libswresample.so, libswscale.so), which the app loads at run time, so
 # anyone can swap in their own build of the same version. Source: the official FFmpeg 7.1.5 release, unchanged.
 #
 #   ./build_ffmpeg.sh /path/to/android-ndk        (macOS or Linux; NDK r27c = 27.2.12479018 was used)
 #
-# Output: out/<abi>/lib*.so and out/include. Inside Monolith's decoder-ffmpeg module they're also copied to
+# Output: out/<abi>/lib*.so (libavcodec, libavformat, libavutil, libswresample, libswscale) and out/include. Inside Monolith's decoder-ffmpeg module they're also copied to
 # src/main/jniLibs/<abi> and src/main/cpp/ffmpeg-include.
 set -eu
 NDK="${1:-${ANDROID_NDK_HOME:-}}"
@@ -22,9 +22,18 @@ case "$(uname -s)" in Darwin) HOST=darwin-x86_64 ;; *) HOST=linux-x86_64 ;; esac
 TC="$NDK/toolchains/llvm/prebuilt/$HOST/bin"
 [ -d "$TC" ] || { echo "NDK toolchain not found at $TC"; exit 1; }
 
-AUDIO="ac3 eac3 truehd mlp dca flac alac opus vorbis mp3 mp2 mp1 aac pcm_mulaw pcm_alaw"
-VIDEO="h264 hevc mpeg1video mpeg2video vc1 wmv3 mpeg4 msmpeg4v1 msmpeg4v2 msmpeg4v3 h263 vp8 vp9"
+AUDIO="ac3 eac3 truehd mlp dca flac alac opus vorbis mp3 mp2 mp1 aac pcm_mulaw pcm_alaw pcm_bluray pcm_dvd
+  wmav1 wmav2 wmapro cook adpcm_swf nellymoser"
+VIDEO="h264 hevc mpeg1video mpeg2video vc1 wmv1 wmv2 wmv3 mpeg4 msmpeg4v1 msmpeg4v2 msmpeg4v3 h263 flv vp6 vp6f vp6a
+  vp8 vp9 rv30 rv40"
+# Containers Media3 can't read (its own extractors stay first): M2TS/BDAV, MPEG-PS/VOB, ASF/WMV, FLV, RealMedia, AVI.
+DEMUXERS="mpegts mpegps asf flv rm avi"
+PARSERS="h264 hevc mpegvideo mpeg4video vc1 ac3 dca mlp aac mpegaudio vorbis opus flac"
+BSFS="h264_mp4toannexb hevc_mp4toannexb aac_adtstoasc"
 DECODERS=""; for d in $AUDIO $VIDEO; do DECODERS="$DECODERS --enable-decoder=$d"; done
+for d in $DEMUXERS; do DECODERS="$DECODERS --enable-demuxer=$d"; done
+for d in $PARSERS; do DECODERS="$DECODERS --enable-parser=$d"; done
+for d in $BSFS; do DECODERS="$DECODERS --enable-bsf=$d"; done
 
 mkdir -p "$WORK"
 TARBALL="$WORK/ffmpeg-$VERSION.tar.xz"
@@ -44,16 +53,16 @@ build() { # abi arch cpu triple extra-cflags
     --extra-cflags="-O2 -fPIC $cflags" --extra-ldflags="-Wl,-z,max-page-size=16384" \
     --enable-shared --disable-static --disable-symver --enable-pic \
     --disable-doc --disable-programs --disable-everything --disable-network --disable-autodetect \
-    --disable-avdevice --disable-avformat --disable-avfilter --disable-postproc \
-    --enable-avcodec --enable-avutil --enable-swresample --enable-swscale \
+    --disable-avdevice --disable-avfilter --disable-postproc \
+    --enable-avcodec --enable-avformat --enable-avutil --enable-swresample --enable-swscale \
     --disable-v4l2-m2m --disable-vulkan --disable-mediacodec --disable-jni \
-    --disable-debug --enable-small \
+    --disable-debug \
     $DECODERS
   grep -q 'CONFIG_GPL 0' config.h && grep -q 'CONFIG_NONFREE 0' config.h || { echo "not an LGPL build"; exit 1; }
   make -j"$JOBS" >/dev/null
   make install >/dev/null
   mkdir -p "$OUT/$abi"
-  for l in avutil swresample swscale avcodec; do
+  for l in avutil swresample swscale avcodec avformat; do
     "$TC/llvm-strip" --strip-unneeded -o "$OUT/$abi/lib$l.so" "$prefix/lib/lib$l.so"
   done
   rm -rf "$OUT/include"; cp -R "$prefix/include" "$OUT/include"
