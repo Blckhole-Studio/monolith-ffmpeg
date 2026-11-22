@@ -10,7 +10,7 @@ or later. It holds everything needed to rebuild exactly what the app ships.
 ## What's in the app
 
 - **FFmpeg 7.1.5**, the official release, unmodified. The exact tarball and its SHA-256 are attached to the
-  [`n7.1.5-2` release](../../releases/tag/n7.1.5-2) (the build the app ships; `n7.1.5` was the first build). It's also at <https://ffmpeg.org/releases/ffmpeg-7.1.5.tar.xz>.
+  [`n7.1.5-3` release](../../releases/tag/n7.1.5-3) (the build the app ships; `n7.1.5` and `n7.1.5-2` were earlier builds). It's also at <https://ffmpeg.org/releases/ffmpeg-7.1.5.tar.xz>.
 - **LGPL only.** It's built without `--enable-gpl` or `--enable-nonfree`. The build script stops if FFmpeg's
   `config.h` reports GPL or non-free.
 - **Two external libraries:**
