@@ -45,7 +45,11 @@ PARSERS="h264 hevc mpegvideo mpeg4video vc1 ac3 dca mlp aac mpegaudio vorbis opu
 # Deinterlacing for interlaced video FFmpeg decodes (MPEG-2, VC-1, H.264 1080i): bwdif, as most players use.
 FILTERS="bwdif buffer buffersink format"
 BSFS="h264_mp4toannexb hevc_mp4toannexb aac_adtstoasc"
+# Encoding, for one thing only: multichannel sound to Dolby Digital for a TV or soundbar that takes AC-3 over HDMI/ARC
+# but not multichannel PCM (DTS, TrueHD, FLAC 5.1… would otherwise be mixed down to stereo).
+ENCODERS="ac3"
 DECODERS=""; for d in $AUDIO $VIDEO; do DECODERS="$DECODERS --enable-decoder=$d"; done
+for e in $ENCODERS; do DECODERS="$DECODERS --enable-encoder=$e"; done
 for d in $DEMUXERS; do DECODERS="$DECODERS --enable-demuxer=$d"; done
 for d in $PARSERS; do DECODERS="$DECODERS --enable-parser=$d"; done
 for d in $BSFS; do DECODERS="$DECODERS --enable-bsf=$d"; done

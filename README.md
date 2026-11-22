@@ -10,7 +10,8 @@ or later. It holds everything needed to rebuild exactly what the app ships.
 ## What's in the app
 
 - **FFmpeg 7.1.5**, the official release, unmodified. The exact tarball and its SHA-256 are attached to the
-  [`n7.1.5-3` release](../../releases/tag/n7.1.5-3) (the build the app ships; `n7.1.5` and `n7.1.5-2` were earlier builds). It's also at <https://ffmpeg.org/releases/ffmpeg-7.1.5.tar.xz>.
+  [`n7.1.5-4` release](../../releases/tag/n7.1.5-4) (the build the app ships; `n7.1.5`, `n7.1.5-2` and `n7.1.5-3` were
+  earlier builds). It's also at <https://ffmpeg.org/releases/ffmpeg-7.1.5.tar.xz>.
 - **LGPL only.** It's built without `--enable-gpl` or `--enable-nonfree`. The build script stops if FFmpeg's
   `config.h` reports GPL or non-free.
 - **Two external libraries:**
@@ -32,7 +33,9 @@ or later. It holds everything needed to rebuild exactly what the app ships.
   containers the app's own readers can't open (M2TS/BDAV, VOB, ASF, FLV, RealMedia, AVI, Matroska and MOV for codecs
   the app's readers drop, Ogg, APE, WavPack, TTA, DSF, DFF, AIFF and WAV).
 - **One filter graph:** bwdif (with buffer, buffersink and format), to deinterlace the video it decodes.
-- Everything else is disabled: no avdevice, network, protocols, programs or autodetected libraries.
+- **One encoder:** AC-3 (Dolby Digital), to send multichannel sound to a TV or soundbar that takes AC-3 over HDMI/ARC
+  but not multichannel PCM.
+- Everything else is disabled: no other encoders, no avdevice, network, protocols, programs or autodetected libraries.
 
 The exact `configure` lines are in [`ffmpeg-configuration-arm64-v8a.txt`](ffmpeg-configuration-arm64-v8a.txt) and
 [`ffmpeg-configuration-armeabi-v7a.txt`](ffmpeg-configuration-armeabi-v7a.txt). In them, `$NDK_BIN` is the NDK's
