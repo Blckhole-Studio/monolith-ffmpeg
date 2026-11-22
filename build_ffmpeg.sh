@@ -39,7 +39,8 @@ VIDEO="h264 hevc mpeg1video mpeg2video vc1 wmv1 wmv2 wmv3 mpeg4 msmpeg4v1 msmpeg
 # Containers Media3 can't read (its own extractors stay first): M2TS/BDAV, MPEG-PS/VOB, ASF/WMV, FLV, RealMedia, AVI;
 # and for codecs Media3's own readers drop: Matroska and MOV/MP4 (ProRes, DNxHD, Theora, RealVideo in MKV…), Ogg
 # (Theora), and audio-only formats (Monkey's Audio, WavPack, TTA, DSD, AIFF, WAV with ADPCM/GSM…).
-DEMUXERS="mpegts mpegps asf flv rm avi matroska mov ogg ape wv tta dsf iff aiff wav"
+DEMUXERS="mpegts mpegps asf flv rm avi matroska mov ogg ape wv tta dsf iff aiff wav
+  mpegvideo h264 hevc m4v vc1"  # the raw ones: MPEG-PS (VOB) names its video only by these probes
 PARSERS="h264 hevc mpegvideo mpeg4video vc1 ac3 dca mlp aac mpegaudio vorbis opus flac rv34 vp3 dvdsub gsm"
 # Deinterlacing for interlaced video FFmpeg decodes (MPEG-2, VC-1, H.264 1080i): bwdif, as most players use.
 FILTERS="bwdif buffer buffersink format"
